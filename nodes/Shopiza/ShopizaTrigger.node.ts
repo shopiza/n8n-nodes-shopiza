@@ -101,7 +101,7 @@ export class ShopizaTrigger implements INodeType {
 				if (!data.webhookId) return false;
 				const url = this.getNodeWebhookUrl('default');
 				const res = await shopizaApiRequest.call(this, 'GET', '/webhooks');
-				const found = ((res && res.data) || []).find(
+				const found = (((res && res.data) as IDataObject[]) || []).find(
 					(w: IDataObject) => String(w.id) === String(data.webhookId) && w.url === url && w.is_active,
 				);
 				if (!found) {
@@ -131,7 +131,12 @@ export class ShopizaTrigger implements INodeType {
 					try {
 						await shopizaApiRequest.call(this, 'DELETE', `/webhooks/${data.webhookId}`);
 					} catch (error) {
-						// Already gone (key revoked, removed in the admin): nothing left to do.
+						// Usually already gone (key revoked, removed in the admin), so
+						// deactivating still succeeds; log it in case it was something else.
+						this.logger.warn('Shopiza: could not remove the webhook', {
+							webhookId: data.webhookId,
+							error: (error as Error).message,
+						});
 					}
 				}
 				delete data.webhookId;

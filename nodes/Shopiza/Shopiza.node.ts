@@ -5,8 +5,9 @@ import type {
 	INodeProperties,
 	INodeType,
 	INodeTypeDescription,
+	JsonObject,
 } from 'n8n-workflow';
-import { NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
+import { NodeApiError, NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
 
 import { clean, shopizaApiRequest, shopizaApiRequestAll } from './GenericFunctions';
 
@@ -174,8 +175,8 @@ export class Shopiza implements INodeType {
 				options: [
 					{ name: 'Get', value: 'get', action: 'Get a product' },
 					{ name: 'Get Many', value: 'getAll', action: 'Get many products' },
-					{ name: 'Update', value: 'update', action: 'Update price, stock or visibility of a product' },
-					{ name: 'Update Variant', value: 'updateVariant', action: 'Update price, stock or visibility of a variant' },
+					{ name: 'Update', value: 'update', action: 'Update a product' },
+					{ name: 'Update Variant', value: 'updateVariant', action: 'Update a variant' },
 				],
 				default: 'getAll',
 			},
@@ -221,10 +222,10 @@ export class Shopiza implements INodeType {
 				displayOptions: show('order', ['update']),
 			},
 			{
-				displayName: 'Options',
+				displayName: 'Update Fields',
 				name: 'updateOptions',
 				type: 'collection',
-				placeholder: 'Add Option',
+				placeholder: 'Add Field',
 				default: {},
 				displayOptions: show('order', ['update']),
 				options: [
@@ -383,7 +384,9 @@ export class Shopiza implements INodeType {
 					out.push({ json: { error: (error as Error).message }, pairedItem: { item: i } });
 					continue;
 				}
-				throw error;
+				// Both constructors hand back an error of their own type unchanged.
+				if (error instanceof NodeApiError) throw new NodeApiError(this.getNode(), error as unknown as JsonObject);
+				throw new NodeOperationError(this.getNode(), error as Error, { itemIndex: i });
 			}
 		}
 		return [out];

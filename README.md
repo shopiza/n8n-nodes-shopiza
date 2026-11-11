@@ -25,6 +25,17 @@ Shopiza only sends webhooks to public **https** addresses, so the trigger works 
 - OpenAPI: https://shopiza.io/api/v1/openapi.json
 - Support: hello@shopiza.io
 
+## Development
+
+```sh
+npm ci
+npm run lint
+npm run build
+SHOPIZA_TEST_KEY=sz_live_... npm test   # runs the built nodes against a test shop
+```
+
+Releases are published by GitHub Actions with npm provenance when a version tag is pushed (see `.github/workflows/publish.yml`).
+
 ## License
 
 MIT

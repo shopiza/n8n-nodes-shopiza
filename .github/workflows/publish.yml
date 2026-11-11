@@ -1,0 +1,50 @@
+# Publishes n8n-nodes-shopiza to npm when a version tag (e.g. 0.2.0) is pushed.
+#
+# n8n requires verified community nodes to be published from GitHub Actions
+# with an npm provenance statement (since 1 May 2026). Authentication is npm
+# Trusted Publishing (OIDC): no npm token is stored in this repository. The
+# trusted publisher is configured on npmjs.com for shopiza/n8n-nodes-shopiza,
+# workflow publish.yml.
+#
+# Release: bump "version" in package.json, add a CHANGELOG entry, commit, then
+#   git tag 0.2.0 && git push origin main --tags
+
+name: Publish
+
+on:
+  push:
+    tags:
+      - '*.*.*'
+
+jobs:
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write # OIDC token for trusted publishing + provenance
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+
+      # Trusted publishing needs npm 11.5.1 or newer.
+      - name: Update npm
+        run: npm install -g npm@11
+
+      - name: Check the tag matches package.json
+        run: test "$(node -p "require('./package.json').version")" = "${GITHUB_REF_NAME}"
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      # In CI this lints, builds and runs `npm publish` with provenance.
+      - name: Release
+        run: npm run release

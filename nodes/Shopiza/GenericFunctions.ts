@@ -19,7 +19,7 @@ export async function shopizaApiRequest(
 	path: string,
 	body: IDataObject = {},
 	qs: IDataObject = {},
-): Promise<any> {
+): Promise<IDataObject> {
 	const options: IHttpRequestOptions = {
 		method,
 		url: `${BASE_URL}${path}`,
@@ -47,7 +47,7 @@ export async function shopizaApiRequestAll(
 	for (;;) {
 		const pageSize = limit ? Math.min(100, limit - out.length) : 100;
 		const res = await shopizaApiRequest.call(this, 'GET', path, {}, { ...qs, page, limit: pageSize });
-		const data = (res && res.data) || [];
+		const data = ((res && res.data) as IDataObject[]) || [];
 		out.push(...data);
 		if (!res.has_more || !data.length || (limit && out.length >= limit)) break;
 		page += 1;
