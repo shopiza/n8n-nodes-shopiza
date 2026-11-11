@@ -44,7 +44,7 @@ export class ShopizaTrigger implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Shopiza Trigger',
 		name: 'shopizaTrigger',
-		icon: 'file:shopiza.png',
+		icon: 'file:shopiza.svg',
 		group: ['trigger'],
 		version: 1,
 		subtitle: '={{$parameter["events"].join(", ")}}',
