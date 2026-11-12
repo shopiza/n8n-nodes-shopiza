@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1 (2026-11-12)
+
+- Fix: the Shopiza API credential showed a broken icon (it pointed at a PNG that is not in the package); it now uses the node's SVG icon.
+
 ## 0.2.0 (2026-11-11)
 
 - Built and linted with the official `@n8n/node-cli`; released from GitHub Actions with npm provenance (staged, approved by a maintainer).

@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-shopiza",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "n8n nodes for Shopiza: trigger on new orders, payments, products and customers, and read or update orders, products and stock.",
   "keywords": [
     "n8n-community-node-package",

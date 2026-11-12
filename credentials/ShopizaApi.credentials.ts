@@ -12,7 +12,7 @@ export class ShopizaApi implements ICredentialType {
 
 	documentationUrl = 'https://shopiza.io/developers';
 
-	icon = 'file:../nodes/Shopiza/shopiza.png' as const;
+	icon = 'file:../nodes/Shopiza/shopiza.svg' as const;
 
 	properties: INodeProperties[] = [
 		{
