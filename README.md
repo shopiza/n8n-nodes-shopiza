@@ -34,7 +34,7 @@ npm run build
 SHOPIZA_TEST_KEY=sz_live_... npm test   # runs the built nodes against a test shop
 ```
 
-Releases are published by GitHub Actions with npm provenance when a version tag is pushed (see `.github/workflows/publish.yml`).
+Releases are built by GitHub Actions and staged on npm with provenance when a version tag is pushed (see `.github/workflows/publish.yml`); a maintainer approves the staged version with 2FA before it goes public.
 
 ## License
 

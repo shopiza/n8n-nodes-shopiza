@@ -1,13 +1,16 @@
-# Publishes n8n-nodes-shopiza to npm when a version tag (e.g. 0.2.0) is pushed.
+# Stages a new n8n-nodes-shopiza version on npm when a version tag (e.g. 0.2.0)
+# is pushed. A maintainer then approves it on npmjs.com (or `npm stage approve`)
+# with 2FA, and only then does it go public.
 #
 # n8n requires verified community nodes to be published from GitHub Actions
 # with an npm provenance statement (since 1 May 2026). Authentication is npm
 # Trusted Publishing (OIDC): no npm token is stored in this repository. The
-# trusted publisher is configured on npmjs.com for shopiza/n8n-nodes-shopiza,
-# workflow publish.yml.
+# trusted publisher on npmjs.com is shopiza/n8n-nodes-shopiza, publish.yml, and
+# is allowed to STAGE only, so a pushed tag alone can never publish.
 #
 # Release: bump "version" in package.json, add a CHANGELOG entry, commit, then
 #   git tag 0.2.0 && git push origin main --tags
+# and approve the staged version on npmjs.com.
 
 name: Publish
 
@@ -18,7 +21,7 @@ on:
 
 jobs:
   publish:
-    name: Publish to npm
+    name: Stage on npm
     runs-on: ubuntu-latest
 
     permissions:
@@ -35,9 +38,9 @@ jobs:
           cache: 'npm'
           registry-url: 'https://registry.npmjs.org'
 
-      # Trusted publishing needs npm 11.5.1 or newer.
+      # Staged publishing (`npm stage`) needs npm 12.
       - name: Update npm
-        run: npm install -g npm@11
+        run: npm install -g npm@12
 
       - name: Check the tag matches package.json
         run: test "$(node -p "require('./package.json').version")" = "${GITHUB_REF_NAME}"
@@ -45,6 +48,14 @@ jobs:
       - name: Install dependencies
         run: npm ci --ignore-scripts
 
-      # In CI this lints, builds and runs `npm publish` with provenance.
-      - name: Release
-        run: npm run release
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      # RELEASE_MODE lets the n8n-node prerelease guard (prepublishOnly) pass.
+      - name: Stage on npm with provenance
+        run: npm stage publish --provenance
+        env:
+          RELEASE_MODE: "true"
